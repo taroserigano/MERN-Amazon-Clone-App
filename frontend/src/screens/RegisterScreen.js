@@ -13,7 +13,7 @@ export default function RegisterScreen(props) {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const { search } = useLocation();
-  const redirectInUrl = new URLSearchParams(search).get('redirect');
+  const redirectInUrl = new URLSearchParams(search).get('redirect'); // looks for redirect=search+string kind of thing
   const redirect = redirectInUrl ? redirectInUrl : '/';
 
   const userRegister = useSelector((state) => state.userRegister);
