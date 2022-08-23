@@ -31,16 +31,19 @@ export default function SupportScreen() {
         behavior: 'smooth',
       });
     }
-
+    // if no socket exists
     if (!socket) {
+      // create one and set it 
       const sk = socketIOClient(ENDPOINT);
       setSocket(sk);
+      // then log in with user info 
       sk.emit('onLogin', {
         _id: userInfo._id,
         name: userInfo.name,
         isAdmin: userInfo.isAdmin,
       });
       
+      // if message was sent from somewhere, 
       sk.on('message', (data) => {
         // allSelectedUser - currently ongoing chat Users 
         // if currently ongoing, add this msg to the existing msg list 
@@ -58,22 +61,30 @@ export default function SupportScreen() {
         }
         setMessages(allMessages);
       });
+      
+      
       sk.on('updateUser', (updatedUser) => {
+        // check if this user exist, 
         const existUser = allUsers.find((user) => user._id === updatedUser._id);
+        // if exist, simply update it 
         if (existUser) {
           allUsers = allUsers.map((user) =>
             user._id === existUser._id ? updatedUser : user
           );
           setUsers(allUsers);
+          // else, Add this user 
         } else {
           allUsers = [...allUsers, updatedUser];
           setUsers(allUsers);
         }
       });
+      
+      // list all existing users
       sk.on('listUsers', (updatedUsers) => {
         allUsers = updatedUsers;
         setUsers(allUsers);
-      });
+      }); 
+      
       sk.on('selectUser', (user) => {
         allMessages = user.messages;
         setMessages(allMessages);
@@ -82,9 +93,12 @@ export default function SupportScreen() {
   }, [messages, socket, users, userInfo]);
 
   const selectUser = (user) => {
+    // essentially, select just ONE user like this 
     allSelectedUser = user;
+    // set the one user 
     setSelectedUser(allSelectedUser);
     const existUser = allUsers.find((x) => x._id === user._id);
+    // all this work below, just to set to: unread - false 
     if (existUser) {
       allUsers = allUsers.map((x) =>
         x._id === existUser._id ? { ...x, unread: false } : x
@@ -93,18 +107,21 @@ export default function SupportScreen() {
     }
     socket.emit('onUserSelected', user);
   };
-
+  
   const submitHandler = (e) => {
     e.preventDefault();
+    // if empty 
     if (!messageBody.trim()) {
       alert('Error. Please type message.');
     } else {
+      // add message 
       allMessages = [
         ...allMessages,
         { body: messageBody, name: userInfo.name },
       ];
       setMessages(allMessages);
       setMessageBody('');
+      // send out this message with onMessage signal 
       setTimeout(() => {
         socket.emit('onMessage', {
           body: messageBody,
