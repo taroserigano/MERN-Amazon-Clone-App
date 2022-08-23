@@ -17,6 +17,7 @@ export default function ChatBox(props) {
   ]);
 
   useEffect(() => {
+    // if chat window open, scroll down to the bottom 
     if (uiMessagesRef.current) {
       uiMessagesRef.current.scrollBy({
         top: uiMessagesRef.current.clientHeight,
