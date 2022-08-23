@@ -59,25 +59,34 @@ io.on('connection', (socket) => {
       }
     }
   });
+  
+  // when User login, 
   socket.on('onLogin', (user) => {
+    // this is, possibly New User, create an instance of it 
     const updatedUser = {
       ...user,
       online: true,
       socketId: socket.id,
       messages: [],
     };
+    // check if user already registered or not 
     const existUser = users.find((x) => x._id === updatedUser._id);
     if (existUser) {
       existUser.socketId = socket.id;
       existUser.online = true;
     } else {
+      // else, push to the Users list 
       users.push(updatedUser);
     }
     console.log('Online', user.name);
     const admin = users.find((x) => x.isAdmin && x.online);
-    if (admin) {
-      io.to(admin.socketId).emit('updateUser', updatedUser);
+    
+    // if admin is online (or exist)
+    if (admin) { 
+      // send the Updated list to admin 
+      io.to(admin.socketId).emit('updateUser', updatedUser); 
     }
+    // if newly registered User is admin, send him the whole list of Users 
     if (updatedUser.isAdmin) {
       io.to(updatedUser.socketId).emit('listUsers', users);
     }
@@ -90,21 +99,28 @@ io.on('connection', (socket) => {
       io.to(admin.socketId).emit('selectUser', existUser);
     }
   });
-
+  
+  // when New Message gets generated, 
   socket.on('onMessage', (message) => {
+    // IF sender is admin, 
     if (message.isAdmin) {
+      // check if recipient is online 
       const user = users.find((x) => x._id === message._id && x.online);
       if (user) {
         io.to(user.socketId).emit('message', message);
         user.messages.push(message);
       }
+      // if sender is NOT admin, 
     } else {
       const admin = users.find((x) => x.isAdmin && x.online);
+      // if admin is online (or exist)
       if (admin) {
+        // send to admin, if online 
         io.to(admin.socketId).emit('message', message);
         const user = users.find((x) => x._id === message._id && x.online);
         user.messages.push(message);
       } else {
+        // if admin is offline, send below msg to this person as if sent from the admin who is absent 
         io.to(socket.id).emit('message', {
           name: 'Admin',
           body: 'Sorry. I am not online right now',
