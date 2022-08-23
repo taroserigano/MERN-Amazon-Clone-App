@@ -22,7 +22,9 @@ export default function SupportScreen() {
   const { userInfo } = userSignin;
 
   useEffect(() => {
+    // if chat window opened previously, (if there's ongoing chat) 
     if (uiMessagesRef.current) {
+      // this will scroll down all the way to the bottom of existing chat 
       uiMessagesRef.current.scrollBy({
         top: uiMessagesRef.current.clientHeight,
         left: 0,
@@ -38,10 +40,14 @@ export default function SupportScreen() {
         name: userInfo.name,
         isAdmin: userInfo.isAdmin,
       });
+      
       sk.on('message', (data) => {
+        // allSelectedUser - currently ongoing chat Users 
+        // if currently ongoing, add this msg to the existing msg list 
         if (allSelectedUser._id === data._id) {
           allMessages = [...allMessages, data];
         } else {
+          // else, find the recipient from allUsers and send it with status: unread 
           const existUser = allUsers.find((user) => user._id === data._id);
           if (existUser) {
             allUsers = allUsers.map((user) =>
