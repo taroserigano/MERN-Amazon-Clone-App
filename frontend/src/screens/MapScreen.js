@@ -43,18 +43,25 @@ export default function MapScreen(props) {
   const onLoadPlaces = (place) => {
     placeRef.current = place;
   };
+  
+  // the google map API will set the location once you finish moving around on the map 
   const onIdle = () => {
     setLocation({
       lat: mapRef.current.center.lat(),
       lng: mapRef.current.center.lng(),
     });
   };
+  
+  // this is, when USer clicks a place like "shop", the google points out at the shop
   const onPlacesChanged = () => {
     const place = placeRef.current.getPlaces()[0].geometry.location;
     setCenter({ lat: place.lat(), lng: place.lng() });
     setLocation({ lat: place.lat(), lng: place.lng() });
   };
   const dispatch = useDispatch();
+  
+  // this runs when submit button pressed 
+  // and sends location info payload
   const onConfirm = () => {
     const places = placeRef.current.getPlaces();
     if (places && places.length === 1) {
@@ -79,7 +86,7 @@ export default function MapScreen(props) {
 
   const getUserCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation os not supported by this browser');
+      alert('Geolocation was not found by the google map');
     } else {
       navigator.geolocation.getCurrentPosition((position) => {
         setCenter({
