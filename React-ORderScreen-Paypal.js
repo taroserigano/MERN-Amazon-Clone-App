@@ -36,8 +36,14 @@ export default function OrderScreen(props) {
   } = orderDeliver;
   const dispatch = useDispatch();
   useEffect(() => {
+    // create and add paypal button 
     const addPayPalScript = async () => {
+      
+      
+      // get client id 
       const { data } = await Axios.get('/api/config/paypal');
+      
+      // create paypal button element 
       const script = document.createElement('script');
       script.type = 'text/javascript';
       script.src = `https://www.paypal.com/sdk/js?client-id=${data}`;
@@ -48,14 +54,20 @@ export default function OrderScreen(props) {
       document.body.appendChild(script);
     };
     if (
+      // if there's no order details loaded on the system,
       !order ||
       successPay ||
       successDeliver ||
       (order && order._id !== orderId)
     ) {
+      
+      // load the order details 
+      // reset the system 
       dispatch({ type: ORDER_PAY_RESET });
       dispatch({ type: ORDER_DELIVER_RESET });
       dispatch(detailsOrder(orderId));
+      
+      // 
     } else {
       if (!order.isPaid) {
         if (!window.paypal) {
