@@ -146,6 +146,14 @@ export default function OrderScreen() {
       }
     } else {
       const loadPaypalScript = async () => {
+        
+        // interact with:
+        // app.get('/api/keys/paypal', (req, res) => {
+        //   res.send(process.env.PAYPAL_CLIENT_ID || 'sb');
+        // });
+        
+        
+        
         const { data: clientId } = await axios.get('/api/keys/paypal', {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
