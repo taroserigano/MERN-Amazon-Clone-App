@@ -74,7 +74,8 @@ export default function OrderScreen() {
     successPay: false,
     loadingPay: false,
   });
-
+  
+  // status, and dispatcher 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
   function createOrder(data, actions) {
