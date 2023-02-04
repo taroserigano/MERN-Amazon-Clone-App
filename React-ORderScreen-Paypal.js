@@ -79,9 +79,53 @@ export default function OrderScreen(props) {
     }
   }, [dispatch, orderId, sdkReady, successPay, successDeliver, order]);
 
+  
+  // payOrder, refer below: 
+  
   const successPaymentHandler = (paymentResult) => {
     dispatch(payOrder(order, paymentResult));
   };
+  
+  export const payOrder = (order, paymentResult) => async (
+  dispatch,
+  getState
+) => {
+  dispatch({ type: ORDER_PAY_REQUEST, payload: { order, paymentResult } });
+  const {
+    userSignin: { userInfo },
+  } = getState();
+  try {
+    const { data } = Axios.put(`/api/orders/${order._id}/pay`, paymentResult, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    });
+    dispatch({ type: ORDER_PAY_SUCCESS, payload: data });
+  } catch (error) {
+    const message =
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+    dispatch({ type: ORDER_PAY_FAIL, payload: message });
+  }
+};
+  
+  export const orderPayReducer = (state = {}, action) => {
+  switch (action.type) {
+    case ORDER_PAY_REQUEST:
+      return { loading: true };
+    case ORDER_PAY_SUCCESS:
+      return { loading: false, success: true };
+    case ORDER_PAY_FAIL:
+      return { loading: false, error: action.payload };
+    case ORDER_PAY_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+  
+  
+  
+  
   const deliverHandler = () => {
     dispatch(deliverOrder(order._id));
   };
