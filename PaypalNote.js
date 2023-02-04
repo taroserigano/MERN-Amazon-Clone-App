@@ -314,6 +314,9 @@ export default function OrderScreen() {
                     {isPending ? (
                       <LoadingBox />
                     ) : (
+                    
+                    
+                    // when order is made, when payment is successful, and when error happens 
                       <div>
                         <PayPalButtons
                           createOrder={createOrder}
