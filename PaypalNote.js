@@ -149,6 +149,9 @@ export default function OrderScreen() {
         const { data: clientId } = await axios.get('/api/keys/paypal', {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
+        
+        // setting up new user ID and currency info here 
+        
         paypalDispatch({
           type: 'resetOptions',
           value: {
@@ -156,6 +159,9 @@ export default function OrderScreen() {
             currency: 'USD',
           },
         });
+        
+        // setting Loading pending 
+        
         paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
       };
       loadPaypalScript();
